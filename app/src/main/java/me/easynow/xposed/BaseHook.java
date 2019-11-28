@@ -9,18 +9,31 @@ public class BaseHook implements IHook {
     @Override
     public void loadPackage(LoadPackageParam loadPackageParam) {
         _loadPackageParam = loadPackageParam;
+        hook();
+    }
+
+    protected void hook(){
+
     }
 
     protected void hookMethod(String className, final String methodName){
-        XposedHelpers.findAndHookMethod(className, _loadPackageParam.classLoader, methodName, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod(className, _loadPackageParam.getClassLoader(), methodName, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                XposedHelpers.findAndHookMethod(this.getClass(),"before_"+methodName);
+                try {
+                    XposedHelpers.callMethod(this, "before_" + methodName, new me.easynow.xposed.MethodHookParam(param));
+                }catch (Exception e){
+
+                }
             }
 
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                try {
+                    XposedHelpers.callMethod(this, "after_" + methodName, new me.easynow.xposed.MethodHookParam(param));
+                }catch (Exception e){
 
+                }
             }
         });
     }
